@@ -23,6 +23,20 @@ namespace FileLotteryKata.Tests
             
             Assert.That(fileLottery.First(), Is.EqualTo(string.Empty));
         }
+
+        [Test]
+        public void DirectoryWithOneFile_ReturnsThatFile()
+        {
+            var randomMock = Substitute.For<IRandomProvider>();
+            var directoryMock = Substitute.For<IDirectoryProvider>();
+
+            const string expectedFile = "File 1";
+            directoryMock.GetFiles().Returns(new[] { expectedFile });
+
+            var fileLottery = new FileLottery(randomMock, directoryMock);
+
+            Assert.That(fileLottery.First(), Is.EqualTo(expectedFile));
+        }
     }
 
     // ReSharper restore InconsistentNaming

@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using FileLotteryKata.Tests;
+using System.Linq;
 
 namespace FileLotteryKata
 {
@@ -10,13 +10,15 @@ namespace FileLotteryKata
         private IRandomProvider _randomProvider;
         private IDirectoryProvider _directoryProvider;
         private readonly List<string> _randomizedItems;
+        private readonly List<string> _items; 
+        private int _currentItem = 0;
 
 
         public FileLottery(IRandomProvider randomProvider, IDirectoryProvider directoryProvider)
         {
             _randomProvider = randomProvider;
             _directoryProvider = directoryProvider;
-            Current = string.Empty;
+            _items = directoryProvider.GetFiles().ToList();
         }
 
         public IEnumerator<string> GetEnumerator()
@@ -36,6 +38,13 @@ namespace FileLotteryKata
 
         public bool MoveNext()
         {
+            if (_items.Count == 0)
+            {
+                Current = string.Empty;
+                return true;
+            }
+
+            Current = _items[_currentItem];
             return true;
         }
 
