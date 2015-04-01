@@ -11,15 +11,22 @@ namespace FileLotteryKata.Tests
     [TestFixture]
     public class FileLotteryTests
     {
+        private IRandomProvider _randomMock;
+        private IDirectoryProvider _directoryMock;
+
+        [SetUp]
+        public void Setup()
+        {
+            _randomMock = Substitute.For<IRandomProvider>();
+            _directoryMock = Substitute.For<IDirectoryProvider>();
+        }
+
         [Test]
         public void EmptyDirectory_ReturnsEmptyString()
         {
-            var randomMock = Substitute.For<IRandomProvider>();
-            var directoryMock = Substitute.For<IDirectoryProvider>();
+            _directoryMock.GetFiles().Returns(new string[] {});
 
-            directoryMock.GetFiles().Returns(new string[] {});
-
-            var fileLottery = new FileLottery(randomMock, directoryMock);
+            var fileLottery = new FileLottery(_randomMock, _directoryMock);
             
             Assert.That(fileLottery.First(), Is.EqualTo(string.Empty));
         }
@@ -27,13 +34,10 @@ namespace FileLotteryKata.Tests
         [Test]
         public void DirectoryWithOneFile_ReturnsThatFile()
         {
-            var randomMock = Substitute.For<IRandomProvider>();
-            var directoryMock = Substitute.For<IDirectoryProvider>();
-
             const string expectedFile = "File 1";
-            directoryMock.GetFiles().Returns(new[] { expectedFile });
+            _directoryMock.GetFiles().Returns(new[] { expectedFile });
 
-            var fileLottery = new FileLottery(randomMock, directoryMock);
+            var fileLottery = new FileLottery(_randomMock, _directoryMock);
 
             Assert.That(fileLottery.First(), Is.EqualTo(expectedFile));
         }
