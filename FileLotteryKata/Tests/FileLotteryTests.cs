@@ -28,7 +28,7 @@ namespace FileLotteryKata.Tests
 
             var fileLottery = new FileLottery(_randomMock, _directoryMock);
             
-            Assert.That(fileLottery.First(), Is.EqualTo(string.Empty));
+            Assert.That(fileLottery.Current, Is.EqualTo(string.Empty));
         }
 
         [Test]
@@ -39,7 +39,20 @@ namespace FileLotteryKata.Tests
 
             var fileLottery = new FileLottery(_randomMock, _directoryMock);
 
-            Assert.That(fileLottery.First(), Is.EqualTo(expectedFile));
+            Assert.That(fileLottery.Current, Is.EqualTo(expectedFile));
+        }
+
+        [Test]
+        public void DirectoryWithTwoFiles_ReturnsAllFiles()
+        {
+            var expectedFiles = new[] {"File 1", "File 2"};
+            _directoryMock.GetFiles().Returns(expectedFiles);
+
+            var fileLottery = new FileLottery(_randomMock, _directoryMock);
+
+            Assert.That(fileLottery.Current, Is.EqualTo("File 1"));
+            fileLottery.MoveNext();
+            Assert.That(fileLottery.Current, Is.EqualTo("File 2"));
         }
     }
 
