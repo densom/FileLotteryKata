@@ -7,9 +7,8 @@ namespace FileLotteryKata
 {
     public class FileLottery : IEnumerator<string>
     {
-        private IRandomProvider _randomProvider;
-        private IDirectoryProvider _directoryProvider;
-        private List<string> _randomizedItems;
+        private readonly IRandomProvider _randomProvider;
+        private readonly List<string> _randomizedItems;
         private readonly List<string> _items; 
         private int _index = 0;
 
@@ -17,7 +16,6 @@ namespace FileLotteryKata
         public FileLottery(IRandomProvider randomProvider, IDirectoryProvider directoryProvider)
         {
             _randomProvider = randomProvider;
-            _directoryProvider = directoryProvider;
             _items = directoryProvider.GetFiles().ToList();
 
             if (_items.Count == 0)
@@ -27,19 +25,17 @@ namespace FileLotteryKata
             }
 
             _randomizedItems = Randomize();
-            Current = _randomizedItems[0];
-            
-            
+            Current = _randomizedItems[0];    
         }
 
         private List<string> Randomize()
         {
             var sortedList = new List<string>(_items.Count);
 
-            _randomProvider.SetMaxIndex = _items.Count - 1;
-            foreach (var randomUniqueValue in _randomProvider.GetRandomUniqueValues())
+            _randomProvider.MaxIndex = _items.Count - 1;
+            foreach (var randomIndex in _randomProvider.GetDistinctRandomValues())
             {
-                sortedList.Add(_items[randomUniqueValue]);
+                sortedList.Add(_items[randomIndex]);
             }
 
             return sortedList;
@@ -47,12 +43,17 @@ namespace FileLotteryKata
 
         public void Dispose()
         {
-            throw new NotImplementedException();
         }
 
         public bool MoveNext()
         {
             _index++;
+
+            if (_index + 1 > _randomizedItems.Count)
+            {
+                return false;
+            }
+
             Current = _randomizedItems[_index];
             return true;
         }

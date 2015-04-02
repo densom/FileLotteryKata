@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Diagnostics;
+using NUnit.Framework;
 using NSubstitute;
 
 namespace FileLotteryKata.Tests
@@ -23,7 +24,7 @@ namespace FileLotteryKata.Tests
         public void EmptyDirectory_ReturnsEmptyString()
         {
             _directoryMock.GetFiles().Returns(new string[] {});
-            _randomMock.GetRandomUniqueValues().Returns(new[] { 0 });
+            _randomMock.GetDistinctRandomValues().Returns(new[] { 0 });
 
             var fileLottery = new FileLottery(_randomMock, _directoryMock);
             
@@ -35,7 +36,7 @@ namespace FileLotteryKata.Tests
         {
             const string expectedFile = "File 1";
             _directoryMock.GetFiles().Returns(new[] { expectedFile });
-            _randomMock.GetRandomUniqueValues().Returns(new[] {0});
+            _randomMock.GetDistinctRandomValues().Returns(new[] {0});
 
             var fileLottery = new FileLottery(_randomMock, _directoryMock);
 
@@ -47,7 +48,7 @@ namespace FileLotteryKata.Tests
         {
             var expectedFiles = new[] {"File 1", "File 2"};
             _directoryMock.GetFiles().Returns(expectedFiles);
-            _randomMock.GetRandomUniqueValues().Returns(new[] { 0, 1 });
+            _randomMock.GetDistinctRandomValues().Returns(new[] { 0, 1 });
 
             var fileLottery = new FileLottery(_randomMock, _directoryMock);
 
@@ -59,7 +60,7 @@ namespace FileLotteryKata.Tests
         [Test]
         public void DirectoryWithTwoFiles_ReturnsAllFilesInRandomOrder()
         {
-            _randomMock.GetRandomUniqueValues().Returns(new[] {1,0});
+            _randomMock.GetDistinctRandomValues().Returns(new[] {1,0});
 
             var expectedFiles = new[] { "File 1", "File 2" };
             _directoryMock.GetFiles().Returns(expectedFiles);
@@ -69,6 +70,23 @@ namespace FileLotteryKata.Tests
             Assert.That(fileLottery.Current, Is.EqualTo("File 2"));
             fileLottery.MoveNext();
             Assert.That(fileLottery.Current, Is.EqualTo("File 1"));
+        }
+
+        [Test]
+        public void RunRealScenario()
+        {
+            _directoryMock.GetFiles().Returns(new[] {"File 1", "File 2", "File 3", "File 4"});
+            var fileLottery = new FileLottery(new RandomProvider(), _directoryMock);
+
+            var continueLoop = true;
+            while (continueLoop)
+            {
+                Debug.WriteLine(fileLottery.Current);
+
+                continueLoop = fileLottery.MoveNext();
+            }
+
+            //todo:  put some sort of assertion here to test that the values are random.
         }
     }
 
